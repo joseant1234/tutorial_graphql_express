@@ -12,6 +12,7 @@ const app = express();
 // el signo ! hace referencia a q esos campos son obligatorios
 // el tipo Query son las consultas q se van hacer al servidor de graphql
 // schema definition language
+// paréntesis se colocan en la query si tienen algun argumento
 const schema = buildSchema(`
   type Course {
     id: ID!
@@ -23,9 +24,14 @@ const schema = buildSchema(`
     getCourses: [Course]
     getCourse(id: ID!): Course
   }
+
+  type Mutation {
+    addCourse(title: String!, views: Int): Course
+    updateCourse(id: ID!, title: String!, views: Int): Course
+  }
 `);
 
-// tiene q tener el mismo nombre de la consulta en el tipo query para poder realizar bien los resolve
+// tiene q tener el mismo nombre de la consulta en el tipo query para poder resolver
 const root = {
   getCourses(){
     return courses;
@@ -33,6 +39,19 @@ const root = {
   getCourse({id}){
     console.log(id);
     return courses.find((course)=> id == course.id);
+  },
+  addCourse({title, views}) {
+    const id = String(courses.length + 1);
+    const course = { id, title, views };
+    courses.push(course);
+    return course;
+  },
+  updateCourse({id, title, views}) {
+    const courseIndex = courses.findIndex(course => course.id === id);
+    const course = courses[courseIndex];
+    const newCourse = Object.assign(course, { title, views });
+    courses[courseIndex] = newCourse;
+    return newCourse;
   }
 }
 
@@ -41,6 +60,8 @@ app.get('', function(req, res) {
 });
 
 // graphiql es una interfaz gráfica para poder realizar consultas de graphql al servidor de graphql
+// como no se indica la forma de resolver, es permitido pasar un rootValue con funciones q sean iguales q las de las consultas
+// el proposito del rootValue es de servir como valor inicial a la resolución de cualquier consulta en graphql
 app.use('/graphql', graphqlHTTP({
     schema,
     rootValue: root,
