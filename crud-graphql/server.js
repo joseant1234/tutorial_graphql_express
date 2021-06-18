@@ -4,7 +4,7 @@ const { buildSchema } = require('graphql');
 
 const graphqlHTTP = require('express-graphql');
 
-const courses = require('./courses');
+let courses = require('./courses');
 
 const app = express();
 
@@ -20,38 +20,62 @@ const schema = buildSchema(`
     views: Int
   }
 
+  type Alert {
+    message: String
+  }
+
+  input CourseInput {
+    title: String!
+    views: Int
+  }
+
   type Query {
-    getCourses: [Course]
+    getCourses(page: Int, limit: Int = 1): [Course]
     getCourse(id: ID!): Course
   }
 
   type Mutation {
-    addCourse(title: String!, views: Int): Course
-    updateCourse(id: ID!, title: String!, views: Int): Course
+    addCourse(input: CourseInput): Course
+    updateCourse(id: ID!, input: CourseInput): Course
+    deleteCourse(id: ID!): Alert
   }
 `);
 
 // tiene q tener el mismo nombre de la consulta en el tipo query para poder resolver
 const root = {
-  getCourses(){
+  getCourses({page, limit}){
+    if (page) {
+      // si comienza en 0 la página
+      // return courses.slice(page * limit, (page + 1) * limit)
+      // si comienza en 1 la página
+      return courses.slice((page - 1) * limit, (page) * limit)
+    }
     return courses;
   },
   getCourse({id}){
     console.log(id);
     return courses.find((course)=> id == course.id);
   },
-  addCourse({title, views}) {
+  addCourse({input}) {
+    // const { title, views } = input;
     const id = String(courses.length + 1);
-    const course = { id, title, views };
+    const course = { id, ...input };
     courses.push(course);
     return course;
   },
-  updateCourse({id, title, views}) {
+  updateCourse({id, input}) {
+    const { title, views } = input;
     const courseIndex = courses.findIndex(course => course.id === id);
     const course = courses[courseIndex];
     const newCourse = Object.assign(course, { title, views });
     courses[courseIndex] = newCourse;
     return newCourse;
+  },
+  deleteCourse({id}) {
+    courses = courses.filter(course => course.id !== id);
+    return {
+      message: 'The course was deleted',
+    }
   }
 }
 
