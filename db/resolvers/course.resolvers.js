@@ -2,14 +2,13 @@ const Course = require('../models/course');
 
 module.exports = {
     Query: {
-        getCourses(obj, { page, limit }) {
-            if (page) {
-                return courses.slice((page - 1) * limit, (page) * limit)
-            }
+        async getCourses(obj, { page, limit }) {
+            const courses = await Course.find();
             return courses;
         },
-        getCourse(obj, { id }) {
-            return courses.find((course)=> id == course.id);
+        async getCourse(obj, { id }) {
+            const course = await Course.findById(id);
+            return course;
         },
     },
     Mutation: {
