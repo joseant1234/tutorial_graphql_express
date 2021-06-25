@@ -1,4 +1,4 @@
-const courses = [];
+const Course = require('../models/course');
 
 module.exports = {
     Query: {
@@ -13,10 +13,9 @@ module.exports = {
         },
     },
     Mutation: {
-        addCourse(obj, { input }) {
-            const id = String(courses.length + 1);
-            const course = { id, ...input };
-            courses.push(course);
+        async addCourse(obj, { input }) {
+            const course = new Course(input);
+            await course.save();
             return course;
         },
         updateCourse(obj, { id, input }) {
