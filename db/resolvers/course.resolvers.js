@@ -17,16 +17,12 @@ module.exports = {
             await course.save();
             return course;
         },
-        updateCourse(obj, { id, input }) {
-            const { title, views } = input;
-            const courseIndex = courses.findIndex(course => course.id === id);
-            const course = courses[courseIndex];
-            const newCourse = Object.assign(course, { title, views });
-            courses[courseIndex] = newCourse;
-            return newCourse;
+        async updateCourse(obj, { id, input }) {
+            const course = await Course.findByIdAndUpdate(id, input);
+            return course;
         },
-        deleteCourse(obj, { id }) {
-            courses = courses.filter(course => course.id !== id);
+        async deleteCourse(obj, { id }) {
+            course = await Course.deleteOne({ _id: id });
             return {
                 message: 'The course was deleted',
             };

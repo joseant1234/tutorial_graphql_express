@@ -8,7 +8,7 @@ module.exports = `
     }
 
     input CourseInput {
-        title: String!
+        title: String
         views: Int
     }
 
