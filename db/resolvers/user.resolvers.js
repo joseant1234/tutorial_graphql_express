@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports = {
     Query: {
         async getUsers() {
-            return await User.find();
+            return await User.find().populate('courses');
         },
         async getUser(obj, { id }) {
             return await User.findById(id);
