@@ -6,7 +6,8 @@ module.exports = {
         async getCourses(obj, { page, limit }) {
             // el metodo populate ('nombreRelación')
             // lo q hace es reemplazar el campo user con solo el id que hace referencia al documento por el documento al q esta referenciado
-            let courses = Course.find().populate('user');
+            // let courses = Course.find().populate('user');
+            let courses = Course.find();
             if (page) {
                 courses = courses.limit(limit).skip((page - 1) * limit);
             }
@@ -36,5 +37,11 @@ module.exports = {
                 message: 'The course was deleted',
             };
         },
+    },
+    Course: {
+        async user(c) {
+            return await User.findById(c.user);
+        }
     }
+
 }
