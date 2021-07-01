@@ -2,7 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
-const { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
+// const { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
+const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
 const { merge } = require('lodash');
 
@@ -31,14 +32,21 @@ const typeDefs = `
 
 const resolver = {};
 
-const schema = makeExecutableSchema({
+// const schema = makeExecutableSchema({
+//     typeDefs: [typeDefs, courseTypeDefs, userTypeDefs],
+//     resolvers: merge(resolver, courseResolvers, userResolvers)
+// });
+
+const server = new ApolloServer({
     typeDefs: [typeDefs, courseTypeDefs, userTypeDefs],
     resolvers: merge(resolver, courseResolvers, userResolvers)
-});
+})
 
-app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
+// app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
 // endpoint a donde se envia las peticiones a procesar
-app.use("/graphiql", graphiqlExpress({ endpointURL: '/graphql' }));
+// app.use("/graphiql", graphiqlExpress({ endpointURL: '/graphql' }));
+
+server.applyMiddleware({ app });
 
 app.listen(8080, () => {
     console.log('Server initialized');
