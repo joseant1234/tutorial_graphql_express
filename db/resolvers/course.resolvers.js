@@ -3,7 +3,7 @@ const User = require('../models/user');
 
 module.exports = {
     Query: {
-        async getCourses(obj, { page, limit }) {
+        async getCourses(obj, { page, limit }, context) {
             // el metodo populate ('nombreRelación')
             // lo q hace es reemplazar el campo user con solo el id que hace referencia al documento por el documento al q esta referenciado
             // let courses = Course.find().populate('user');
